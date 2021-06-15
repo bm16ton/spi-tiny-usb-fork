@@ -1,0 +1,1 @@
+cmd_/home/maddocks/src/spi-tiny-usb/module/Module.symvers := sed 's/ko$$/o/' /home/maddocks/src/spi-tiny-usb/module/modules.order | scripts/mod/modpost     -o /home/maddocks/src/spi-tiny-usb/module/Module.symvers -e -i Module.symvers  -N -T -

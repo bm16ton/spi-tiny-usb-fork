@@ -1,0 +1,64 @@
+BUILDDIR = ./
+
+DEVICE = stm32f103
+CORE = stm32-utils
+PERIPH = stm32-utils
+DISCOVERY = stm32-utils
+USB = stm32-utils/usb
+
+SOURCES += firmware/main.c
+
+SOURCES += firmware/isr.c \
+		   firmware/descs.c \
+		   firmware/stm32-utils/delay.c \
+		   firmware/stm32-utils/myprintf.c \
+		   firmware/stm32-utils/usb/kdusb/kdusb_lib.c
+
+
+OBJECTS = $(addprefix $(BUILDDIR)/, $(addsuffix .o, $(basename $(SOURCES))))
+
+INCLUDES += -I. \
+			-Ifirmware/stm32-utils \
+			-Istm32-utils/usb \
+			-Ifirmware/stm32-utils/usb/kdusb \
+			-I\
+
+ELF = $(BUILDDIR)/program.elf
+HEX = $(BUILDDIR)/program.hex
+BIN = $(BUILDDIR)/program.bin
+
+CC = arm-none-eabi-gcc
+LD = arm-none-eabi-gcc
+AR = arm-none-eabi-ar
+OBJCOPY = arm-none-eabi-objcopy
+
+CFLAGS  = -O0 -g -Wall -I. -I.firmware/ -Ifkdusb -I.firmware/stm32-utils -I.firmware/stm32-utils/usb -I.firmware/stm32-utils/usb/kdusb/ \
+   -mcpu=cortex-m3 -mthumb \
+   -mfloat-abi=soft -D__NO_SYSTEM_INIT\
+
+
+LDSCRIPT = firmware/main.ld
+LDFLAGS += -T$(LDSCRIPT) -mcpu=cortex-m3 -mthumb -nostdlib -march=armv7 -nostartfiles --specs=nosys.specs -lnosys
+
+$(BIN): $(ELF)
+	$(OBJCOPY) -O binary $< $@
+
+$(HEX): $(ELF)
+	$(OBJCOPY) -O ihex $< $@
+
+$(ELF): $(OBJECTS)
+	$(LD) $(LDFLAGS) -nostartfiles -o $@ $(OBJECTS) $(LDLIBS)
+
+$(BUILDDIR)/%.o: %.c
+	mkdir -p $(dir $@)
+	$(CC) -c $(CFLAGS) $< -o $@
+
+$(BUILDDIR)/%.o: %.s
+	mkdir -p $(dir $@)
+	$(CC) -c $(CFLAGS) $< -o $@
+
+flash: $(BIN)
+	st-flash write $(BIN) 0x8000000
+
+clean:
+	rm -rf build
