@@ -350,7 +350,6 @@ static int spi_tiny_usb_probe(struct usb_interface *interface,
 			 usb_rcvintpipe(priv->usb_dev, 1), priv->urbBuffer, 64,
 			 spi_tiny_usb_urb_complete, priv, 10);
 
- //   usb_submit_urb(priv->urb, GFP_KERNEL);
 
 	ret = usb_submit_urb(priv->urb, GFP_KERNEL);
 	if (ret)

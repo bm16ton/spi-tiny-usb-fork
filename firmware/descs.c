@@ -15,7 +15,7 @@ const uint8_t USB_DeviceDescriptor[] =
 	64,   /* bMaxPacketSize0 */
 	0xc1, 0x16,   /* idVendor = 0x0483 */
 	0xdb, 0x06,   /* idProduct = 0x7540 */
-	0x01,
+	0x02,
 	0x01,   /* bcdDevice = 2.00 */
 	1,              /* Index of string descriptor describing manufacturer */
 	2,              /* Index of string descriptor describing product */

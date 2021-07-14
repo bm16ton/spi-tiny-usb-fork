@@ -1,4 +1,4 @@
-Forked from https://github.com/KrystianD/spi-tiny-usb.git . created makefile replaced sum deprecated kernel calls, currently fails to initialize spi but when check is bypassed gpio etc work. Very much a WIP that i have little time for, and usb spi with kernel driver for ftdi ft2232h in my repos works.
+Forked from https://github.com/KrystianD/spi-tiny-usb.git . created makefile replaced sum deprecated kernel calls, Fixed usb endpoints, Both firmware and module load and work. Enumerates as spidev device, gpio for led and interupt pin, and as UIO device. Will hopefully get around to removing IOU, adding gpios and replacing spidev with a mechanism to specify spi device platform info
 
 
 spi-tiny-usb
