@@ -1,4 +1,7 @@
 #define LED GPIOC,13
+#define RESET GPIOC,14
+#define DC GPIOC,15
+
 
 #define SPI_IRQ  GPIOB,0
 #define SPI_CE   GPIOA,4

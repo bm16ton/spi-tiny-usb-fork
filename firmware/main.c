@@ -79,6 +79,10 @@ void main()
 	IO_HIGH(LED);
 	IO_INPUT_PP(GP);
 	IO_HIGH(GP);
+	IO_INPUT_PP(RESET);
+	IO_HIGH(RESET);
+	IO_INPUT_PP(DC);
+	IO_HIGH(DC);
 
 	// Init USB
 	usbInit();
@@ -156,6 +160,8 @@ uint16_t usbFunctionSetup()
 		if (gpio == 1)
 		{
 			IO_PUSH_PULL(GP);
+			IO_PUSH_PULL(DC);
+			IO_PUSH_PULL(RESET);
 		}
 		return 0;
 	case USB_CMD_GPIO_INPUT:
@@ -163,6 +169,10 @@ uint16_t usbFunctionSetup()
 		{
 			IO_INPUT_PP(GP);
 			IO_HIGH(GP);
+			IO_INPUT_PP(DC);
+			IO_HIGH(DC);
+			IO_INPUT_PP(RESET);
+			IO_HIGH(RESET);
 		}
 		return 0;
 	case USB_CMD_GPIO_SET:
@@ -170,6 +180,8 @@ uint16_t usbFunctionSetup()
 		{
 		case 0: if (val) IO_HIGH(LED); else IO_LOW(LED); break;
 		case 1: if (val) IO_HIGH(GP); else IO_LOW(GP); break;
+		case 2: if (val) IO_HIGH(DC); else IO_LOW(DC); break;
+		case 3: if (val) IO_HIGH(RESET); else IO_LOW(RESET); break;
 		}
 		return 0;
 	case USB_CMD_GPIO_GET:
@@ -177,6 +189,8 @@ uint16_t usbFunctionSetup()
 		{
 		case 0: val = IO_IS_HIGH(LED); break;
 		case 1: val = IO_IS_HIGH(GP); break;
+		case 2: val = IO_IS_HIGH(DC); break;
+		case 3: val = IO_IS_HIGH(RESET); break;
 		}
 		dataGPIO[0] = val;
 		usbData = dataGPIO;

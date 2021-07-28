@@ -39,7 +39,7 @@
 //16ton
 //#define UIO_IRQ_CUSTOM 329
 
-const char *gpio_names[] = { "led", "ext" };
+const char *gpio_names[] = { "led", "GP", "EXT", "RESET", "DC" };
 
 /* Structure to hold all of our device specific stuff */
 struct spi_tiny_usb {
@@ -48,7 +48,7 @@ struct spi_tiny_usb {
 	struct urb *urb;	/* urb for usb interrupt transfer */
 	char *urbBuffer;	/* urb incoming data buffer */
 	struct spi_master *master;	/* spi master related things */
-	struct spi_device *spidev;	/* spi device related things */
+	struct spi_device *ili9341;	/* spi device related things */
 	struct spi_board_info info;	/* board info for spidev module */
 	struct uio_info *uio;	/* Userspace IO for interrupt management */
 	struct gpio_chip gpio_chip;	/* gpio related things */
@@ -95,7 +95,7 @@ static int spi_tiny_usb_xfer_one(struct spi_master *master, struct spi_message *
 
 		dev_dbg(&master->dev,
 			"tx: %p rx: %p len: %d speed: %d flags: %d delay: %d\n", t->tx_buf,
-			t->rx_buf, t->len, t->speed_hz, spi_flags, t->delay_usecs);
+			t->rx_buf, t->len, t->speed_hz, spi_flags, t->delay.value);
 
 		if (t->cs_change)
 			spi_flags |= FLAGS_END;
@@ -128,8 +128,8 @@ static int spi_tiny_usb_xfer_one(struct spi_master *master, struct spi_message *
 
 		m->actual_length += t->len;
 
-		if (t->delay_usecs)
-			udelay(t->delay_usecs);
+		if (t->delay.value)
+			udelay(t->delay.value);
 
 		spi_flags = 0;
 
@@ -305,14 +305,14 @@ static int spi_tiny_usb_probe(struct usb_interface *interface,
 	if (ret)
 		goto error2;
 
-	strcpy(priv->info.modalias, "spidev");
+	strcpy(priv->info.modalias, "ili9341");
 	priv->info.max_speed_hz = 48 * 1000 * 1000 / 2;
 	priv->info.chip_select = 0;
 	priv->info.mode = SPI_MODE_0;
 
 	priv->info.controller_data = priv;
-	priv->spidev = spi_new_device(priv->master, &priv->info);
-	if (!priv->spidev)
+	priv->ili9341 = spi_new_device(priv->master, &priv->info);
+	if (!priv->ili9341)
 		goto error2;
 	dev_info(&interface->dev, "added new SPI device\n");
 
@@ -367,7 +367,7 @@ static int spi_tiny_usb_probe(struct usb_interface *interface,
 	priv->gpio_chip.get = spi_tiny_usb_gpio_get;
 	priv->gpio_chip.set = spi_tiny_usb_gpio_set;
 	priv->gpio_chip.base = -1;
-	priv->gpio_chip.ngpio = 2;
+	priv->gpio_chip.ngpio = 5;
 	priv->gpio_chip.names = gpio_names;
 
 	dev_dbg(&interface->dev, "adding GPIO interface\n");
